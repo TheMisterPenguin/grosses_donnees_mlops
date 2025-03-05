@@ -1,6 +1,7 @@
 import { Octokit } from "https://esm.sh/octokit?dts";
 import { delay } from "jsr:@std/async";
 import { load } from "jsr:@std/dotenv";
+import { Kafka } from "https://esm.sh/kafkajs?dts";
 await load({envPath : ".env.local", export: true}).then(loaded => {
   if(Object.keys(loaded).length === 0) throw Error(".env.local not found")});
 console.log(Deno.env.toObject())
@@ -32,13 +33,36 @@ async function getRepos(query : string) {
   while (true) {
 		const res = await octokit.rest.search.repos({q: query, sort: "updated", per_page: 100, page});
 
-		// On écrit dans mongoDB
-		repos.insertMany(res.data.items);
+		// // On écrit dans mongoDB
+
+		// repos.insertMany(res.data.items);
+
+
+		// Envoi des données dans le topic "repo" de Kafka sur localhost:9092
+		const kafka = new Kafka({
+			clientId: 'repo-fetcher',
+			brokers: ['localhost:9092']
+		});
+
+		const producer = kafka.producer();
+		await producer.connect();
+
+		await producer.send({
+			topic: 'repo',
+			messages: res.data.items.map(item => ({ value: JSON.stringify(item) }))
+		});
+
+		await producer.disconnect();
+
+
+
+
 		console.log(`\tAdded ${res.data.items.length} records`);
 
 		// On regarde si on est rate limited
 		if (res.headers["x-ratelimit-remaining"] === "0") {
 			// On attend jusqu'à pouvoir reprendre
+
 			const currentTime = Date.now();
 
 			console.log(`\tBeing rate limited waiting : ${Intl.DateTimeFormat("FR-fr", {timeStyle: "long"}).format(Number(res.headers["x-ratelimit-reset"]))}`);

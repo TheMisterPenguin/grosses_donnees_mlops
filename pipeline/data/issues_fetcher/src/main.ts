@@ -1,6 +1,7 @@
 import { Octokit } from "https://esm.sh/octokit?dts";
 import { delay } from "jsr:@std/async";
 import { load } from "jsr:@std/dotenv";
+import { Kafka } from "https://esm.sh/kafkajs?dts";
 await load({envPath: ".env.local", export: true}).then(loaded => {
 	if (Object.keys(loaded).length === 0) throw Error(".env.local not found");
 });
@@ -15,14 +16,39 @@ if (!Deno.env.get("GH_TOKEN")) {
 
 octokit.log.info("Connected to GitHub");
 
+
 async function getIssues(owner: string, repoName: string) {
 	let page = 1;
 
 	while (true) {
 		const res = await octokit.rest.issues.listForRepo({state: "all", owner, repo: repoName, per_page: 100, page});
 
-		// On écrit dans mongoDB
-		issues.insertMany(res.data);
+		// // On écrit dans mongoDB
+		// issues.insertMany(res.data);
+
+
+		// Envoi des données dans le topic "issues" de Kafka sur localhost:9092
+		const kafka = new Kafka({
+			clientId: 'issues-fetcher',
+			brokers: ['localhost:9092']
+		});
+
+		const producer = kafka.producer();
+		await producer.connect();
+
+		for (const issue of res.data) {
+			await producer.send({
+				topic: 'issues',
+				messages: [
+					{ value: JSON.stringify(issue) }
+				]
+			});
+		}
+
+		await producer.disconnect();
+
+
+
 		console.log(`\tAdded ${res.data.length} records`);
 
 		// On regarde si on est rate limited
@@ -46,6 +72,5 @@ async function getIssues(owner: string, repoName: string) {
 
 for await (const doc of repos.find()) {
 	console.log(`Fetching issues for repo ${doc.owner.login}/${doc.name} (${doc.id})`);
-
 	await getIssues(doc.owner.login, doc.name);
 }
