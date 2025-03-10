@@ -7,27 +7,22 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build ./src/issues-classifier-next/ --file Dockerfile --tag ghcr.io/themisterpenguin/front:latest
-    - name: Docker Login
-    - uses: docker/login-action@v3.3.0
-      with:
-        # Server address of Docker registry. If not set then will default to Docker Hub
-        registry: ghcr.io
-        # Username used to log against the Docker registry
-        username: themisterpenguin
-        # Password or personal access token used to log against the Docker registry
-        password: ${{ secrets.GITHUB_TOKEN }}
-        # Specifies whether the given registry is ECR (auto, true or false)
-        ecr: auto
-    - name: Docker Login
-      run: docker push ghcr.io/themisterpenguin/front:latest
-    
-            
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build the Docker image
+        run: docker build ./src/issues-classifier-next/ --file Dockerfile --tag ghcr.io/themisterpenguin/front:latest
+
+      - name: Push Docker image to GHCR
+        run: docker push ghcr.io/themisterpenguin/front:latest
