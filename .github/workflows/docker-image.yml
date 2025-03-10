@@ -22,7 +22,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build the Docker image
-        run: docker build ./src/issues-classifier-next/ --file Dockerfile --tag ghcr.io/themisterpenguin/front:latest
+        run: docker build ./src/issues-classifier-next --file Dockerfile --tag ghcr.io/themisterpenguin/front:latest
 
       - name: Push Docker image to GHCR
         run: docker push ghcr.io/themisterpenguin/front:latest
