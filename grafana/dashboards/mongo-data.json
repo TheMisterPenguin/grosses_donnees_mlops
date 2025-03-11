@@ -1,0 +1,331 @@
+{
+	"id": null,
+	"uid": "mongo-data",
+	"title": "MongoDB Data",
+	"tags": ["mongo"],
+	"timezone": "browser",
+	"schemaVersion": 16,
+	"version": 0,
+	"panels": [
+		{
+			"datasource": {
+				"type": "haohanyang-mongodb-datasource",
+				"uid": "P1CC9A79BDAF09793"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "palette-classic"
+					},
+					"custom": {
+						"hideFrom": {
+							"legend": false,
+							"tooltip": false,
+							"viz": false
+						}
+					},
+					"mappings": []
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 8,
+				"w": 12,
+				"x": 0,
+				"y": 0
+			},
+			"id": 1,
+			"options": {
+				"displayLabels": ["name", "percent"],
+				"legend": {
+					"displayMode": "list",
+					"placement": "bottom",
+					"showLegend": true
+				},
+				"pieType": "pie",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"tooltip": {
+					"hideZeros": false,
+					"mode": "single",
+					"sort": "none"
+				}
+			},
+			"pluginVersion": "11.5.2",
+			"targets": [
+				{
+					"aggregateAllowDiskUse": true,
+					"aggregateBatchSize": 1000,
+					"aggregateBypassDocumentValidation": true,
+					"collection": "issues_final",
+					"datasource": {
+						"type": "haohanyang-mongodb-datasource",
+						"uid": "P1CC9A79BDAF09793"
+					},
+					"isStreaming": false,
+					"queryLanguage": "json",
+					"queryText": "[\n  { \"$project\": { \"labels\": 1, \"_id\": 0 } }, \n  { \"$unwind\": \"$labels\" }, \n  { \"$project\": { \"label\": \"$labels\" } },\n  {\"$limit\": 25000}\n]",
+					"queryType": "table",
+					"refId": "A"
+				}
+			],
+			"title": "Répartition des labels (traités)",
+			"transformations": [
+				{
+					"id": "extractFields",
+					"options": {
+						"delimiter": ",",
+						"format": "delimiter",
+						"keepTime": false,
+						"replace": true,
+						"source": "label"
+					}
+				},
+				{
+					"id": "reduce",
+					"options": {
+						"includeTimeField": false,
+						"labelsToFields": false,
+						"mode": "reduceFields",
+						"reducers": ["count"]
+					}
+				}
+			],
+			"type": "piechart"
+		},
+    {
+		"datasource": {
+			"type": "haohanyang-mongodb-datasource",
+			"uid": "P1CC9A79BDAF09793"
+		},
+		"fieldConfig": {
+			"defaults": {
+				"color": {
+					"mode": "palette-classic"
+				},
+				"custom": {
+					"hideFrom": {
+						"legend": false,
+						"tooltip": false,
+						"viz": false
+					}
+				},
+				"mappings": []
+			},
+			"overrides": []
+		},
+		"gridPos": {
+			"h": 8,
+			"w": 12,
+			"x": 0,
+			"y": 0
+		},
+		"id": 1,
+		"options": {
+			"displayLabels": ["name", "percent"],
+			"legend": {
+				"displayMode": "list",
+				"placement": "bottom",
+				"showLegend": true
+			},
+			"pieType": "pie",
+			"reduceOptions": {
+				"calcs": ["lastNotNull"],
+				"fields": "",
+				"values": false
+			},
+			"tooltip": {
+				"hideZeros": false,
+				"mode": "single",
+				"sort": "none"
+			}
+		},
+		"pluginVersion": "11.5.2",
+		"targets": [
+			{
+				"aggregateAllowDiskUse": true,
+				"aggregateBatchSize": 1000,
+				"aggregateBypassDocumentValidation": true,
+				"collection": "issues_refined",
+				"datasource": {
+					"type": "haohanyang-mongodb-datasource",
+					"uid": "P1CC9A79BDAF09793"
+				},
+				"isStreaming": false,
+				"queryLanguage": "json",
+				"queryText": "[\n  { \"$project\": { \"labels\": 1, \"_id\": 0 } }, \n  { \"$unwind\": \"$labels\" }, \n  { \"$project\": { \"label\": \"$labels\" } },\n  {\"$limit\": 25000}\n]",
+				"queryType": "table",
+				"refId": "B"
+			}
+		],
+		"title": "Répartition des labels (non traités)",
+		"transformations": [
+			{
+				"id": "extractFields",
+				"options": {
+					"delimiter": ",",
+					"format": "delimiter",
+					"keepTime": false,
+					"replace": true,
+					"source": "label"
+				}
+			},
+			{
+				"id": "reduce",
+				"options": {
+					"includeTimeField": false,
+					"labelsToFields": false,
+					"mode": "reduceFields",
+					"reducers": ["count"]
+				}
+			}
+		],
+		"type": "piechart"
+	}
+	]
+}
+
+/*
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "go_memstats_alloc_bytes",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Panel Title",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 40,
+  "tags": [
+    "mongo"
+  ],
+  "templating": {
+    "list": []
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "MongoDB Metrics",
+  "uid": "mongo",
+  "version": 1,
+  "weekStart": ""
+}*/

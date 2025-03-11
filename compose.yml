@@ -1,0 +1,58 @@
+services:
+  model :
+    image: ghcr.io/themisterpenguin/model:latest
+    container_name: model
+    restart: always
+  front :
+    image: ghcr.io/themisterpenguin/front:latest
+    container_name: front
+    restart: always
+    depends_on:
+      - model
+    environment:
+      - API_URL=http://model:5000
+    ports:
+      - "3000:3000"
+  mongo-exporter:
+    image: percona/mongodb_exporter:0.43
+    container_name: mongo-exporter
+    restart: always
+    command:
+      - "--mongodb.uri=mongodb+srv://DBmaster:V%40oJ%5ByOsV5osw%40j'_7KS%40%5BZ!6qD%3DVZ5wcnAz%7DE%3Dx%26qeY%5EQhvU%2B@bdd1.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000"
+      - "--no-mongodb.direct-connect"
+    ports:
+      - "9216:9216"
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
+    depends_on:
+      - mongo-exporter
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=haohanyang-mongodb-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/etc/grafana/dashboards
+      - ./grafana/mongodb-datasource:/var/lib/grafana/plugins/haohanyang-mongodb-datasource
+    depends_on:
+      - prometheus
+volumes:
+  grafana_data:

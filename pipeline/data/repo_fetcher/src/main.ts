@@ -1,7 +1,7 @@
+import { Kafka } from "https://esm.sh/kafkajs?dts";
 import { Octokit } from "https://esm.sh/octokit?dts";
 import { delay } from "jsr:@std/async";
 import { load } from "jsr:@std/dotenv";
-import { Kafka } from "https://esm.sh/kafkajs?dts";
 await load({envPath : ".env.local", export: true}).then(loaded => {
   if(Object.keys(loaded).length === 0) throw Error(".env.local not found")});
 console.log(Deno.env.toObject())
@@ -31,7 +31,7 @@ async function getRepos(query : string) {
   let page = 1
   
   while (true) {
-		const res = await octokit.rest.search.repos({q: query, sort: "updated", per_page: 100, page});
+	const res = await octokit.rest.search.repos({q: query, sort: "updated", per_page: 100, page});
 
 		// // On écrit dans mongoDB
 
@@ -65,29 +65,29 @@ async function getRepos(query : string) {
 
 			const currentTime = Date.now();
 
-			console.log(`\tBeing rate limited waiting : ${Intl.DateTimeFormat("FR-fr", {timeStyle: "long"}).format(Number(res.headers["x-ratelimit-reset"]))}`);
-			await delay(Number(res.headers["x-ratelimit-reset"]) - currentTime + 5);
-		}
+		console.log(`\tBeing rate limited waiting : ${Intl.DateTimeFormat("FR-fr", {timeStyle: "long"}).format(Number(res.headers["x-ratelimit-reset"]))}`);
+		await delay(Number(res.headers["x-ratelimit-reset"]) - currentTime + 5);
+	}
 
-		// On check si on a fini
-		if (res.data.items.length < 100) {
-			console.log("\tDone");
-			break;
-		}
+	// On check si on a fini
+	if (res.data.items.length < 100) {
+		console.log("\tDone");
+		break;
+	}
 
     if(page + 1 === 11){
         console.log("\tExiting because there are more than 1000 results");
 				break;
     }
 
-		page += 1;
+	page += 1;
   }
 }
 
-// for (const [upper, lower] of accumulator()){
-//   console.log(`Fetching repos with stars between ${lower} and ${upper}`);
+for (const [upper, lower] of accumulator()){
+  console.log(`Fetching repos with stars between ${lower} and ${upper}`);
 
-//   await getRepos(`stars:${lower}..${upper}`);
-// }
+  await getRepos(`stars:${lower}..${upper}`);
+}
 
-await getRepos(`stars:>10000`);
+// await getRepos(`stars:>10000`);

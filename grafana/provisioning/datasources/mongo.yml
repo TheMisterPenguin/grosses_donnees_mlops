@@ -1,0 +1,21 @@
+apiVersion: 1
+
+datasources:
+  - name: "mongodb"
+    type: "haohanyang-mongodb-datasource"
+    access: proxy
+    isDefault: false
+    uid: P1CC9A79BDAF09793
+    orgId: 1
+    version: 1
+    editable: false
+    jsonData:
+      host: bdd1.mongocluster.cosmos.azure.com
+      port: 27017
+      database: github
+      authType: auth-username-password
+      username: DBmaster
+      connectionStringScheme: dns_seed_list
+      connectionParameters: tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false
+    secureJsonData:
+      password: V%40oJ%5ByOsV5osw%40j'_7KS%40%5BZ!6qD%3DVZ5wcnAz%7DE%3Dx%26qeY%5EQhvU%2B
